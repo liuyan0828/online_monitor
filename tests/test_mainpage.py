@@ -25,6 +25,29 @@ async def test_sports_page(browser_context):
     page = await browser_context.new_page()
     await page.goto("https://sports.sohu.com")
 
+    # 等待卡片加载
+    cards = page.locator("a.top-match-card-item")
+    await cards.first.wait_for()
+
+    # 获取第一张卡片的 x 坐标 (点击前)
+    box_before = await cards.nth(0).bounding_box()
+    x_before = box_before["x"]
+    print(f"Before click: x = {x_before}")
+
+    # 点击 swiper-next 按钮
+    next_btn = page.locator("div.swiper-next")
+    await next_btn.click()
+    await page.wait_for_timeout(800)  # 等待动画完成
+
+    # 获取第一张卡片的 x 坐标 (点击后)
+    box_after = await cards.nth(0).bounding_box()
+    x_after = box_after["x"]
+    print(f"After click: x = {x_after}")
+
+    # ✅ 验证位置是否左移
+    assert x_after < x_before, f"❌ Card did not move left. x_before={x_before}, x_after={x_after}"
+    print(f"✅ Card moved left from {x_before} → {x_after}")
+
     await expect(page.locator('.firstChannelText')).to_have_text("体育")
     assert "体育" in await page.locator('.firstChannelText').inner_text(), "标题不包含 '体育'"
 
@@ -45,6 +68,7 @@ async def test_sports_page(browser_context):
 
     search_input = page.locator('input.search-input')
     await expect(search_input).to_be_visible()
+
 
     await page.close()
 '''

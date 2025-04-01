@@ -33,6 +33,14 @@ async def test_search_functionality():
         new_page = await new_page_info.value  # 🎯 新页面对象
         await new_page.wait_for_load_state("domcontentloaded")
 
+        # 获取新页面 URL
+        new_url = new_page.url
+
+        # 发起 API 请求校验状态码
+        response = await context.request.get(new_url)
+        assert response.status == 200
+        print(f"✅ New page URL: {new_url} → Status: {response.status}")
+
         # ✅ 检查新页面标题或URL是否包含搜索词
         assert placeholder in await new_page.title()
         print("✅ 搜索跳转成功，搜索结果页已打开")
