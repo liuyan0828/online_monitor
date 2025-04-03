@@ -1,16 +1,22 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+import subprocess
+import os
+from datetime import datetime
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def run_tests():
+    # 创建 reports 目录
+    os.makedirs("reports", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_path = f"reports/report_{timestamp}.html"
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # 运行 pytest 命令
+    cmd = f"pytest tests/ -v --html={report_path} --self-contained-html"
+    result = subprocess.run(cmd, shell=True)
+
+    if result.returncode == 0:
+        print(f"✅ 测试全部通过！报告位置: {report_path}")
+    else:
+        print(f"❗️ 测试有失败！请查看报告: {report_path}")
+
+if __name__ == "__main__":
+    run_tests()
